@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitcoinHistoryData", "BitcoinHistoryData\BitcoinHistoryData.csproj", "{A939EBCE-4C38-4520-982F-69AB547040A7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RetrieveData", "RetrieveData\RetrieveData.csproj", "{D59940CA-F636-4CFC-92FB-59C5F93940DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A939EBCE-4C38-4520-982F-69AB547040A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A939EBCE-4C38-4520-982F-69AB547040A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A939EBCE-4C38-4520-982F-69AB547040A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A939EBCE-4C38-4520-982F-69AB547040A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D59940CA-F636-4CFC-92FB-59C5F93940DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D59940CA-F636-4CFC-92FB-59C5F93940DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D59940CA-F636-4CFC-92FB-59C5F93940DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D59940CA-F636-4CFC-92FB-59C5F93940DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E5A374F5-40DA-410B-B748-BA1091986A2A}
+	EndGlobalSection
+EndGlobal

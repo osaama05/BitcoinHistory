@@ -1,0 +1,148 @@
+﻿@page "/crypto"
+@using System.Globalization
+@using RetrieveData.Models;
+@inject CryptoController controller
+
+<PageTitle>Crypto</PageTitle>
+
+<h3>Crypto</h3>
+
+<div>
+	<label for="fromDate">From:</label>
+	<br>
+	<input type="date" id="fromDate" name="fromdate" @bind="fromDate">
+	<br>
+	<label for="toDate">To:</label>
+	<br>
+	<input type="date" id="toDate" name="toDate" @bind="toDate">
+	<br>
+	<button onclick="@(async () => await GetDataAsync())">Show data</button>
+</div>
+
+<div>
+	@if (longestBearish != null)
+	{
+		<p>Longest downward trend: @longestBearish.ToString()</p>
+	}
+
+	@if (highestVolume != null && highestVolumeDate != null)
+	{
+		<p>Highest volume: @highestVolume.ToString()€ on @highestVolumeDate.Value.ToString("dd.MM.yyyy")</p>
+	}
+
+	@if (bestDateToBuy != null && bestDateToSell != null)
+	{
+		<p>Best date to buy: @bestDateToBuy.Value.ToString("dd.MM.yyyy")</p>
+
+		<p>Best date to sell: @bestDateToSell.Value.ToString("dd.MM.yyyy")</p>
+
+		<p>Profit: @bestProfit.ToString()€</p>
+	}
+
+	@if (bestProfit <= 0)
+	{
+		<p>Price only drops in given range.</p>
+	}
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 my-5">
+			<RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
+				<RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+				<RadzenLabel Text="Smooth" For="smooth" Style="margin-right: 1rem;" />
+			</RadzenCard>
+			<RadzenChart>
+				<RadzenLineSeries Smooth="@smooth" Data="@priceHistory" CategoryProperty="Date" Title="Price" ValueProperty="Value">
+					<TooltipTemplate Context="bitcoin">
+						<div>
+							<span>@FormatAsFullDay(bitcoin.Date)</span>:
+							<strong>@Math.Round(bitcoin.Value, 2) €</strong>
+						</div>
+					</TooltipTemplate>
+				</RadzenLineSeries>
+				<RadzenMarkers MarkerType="MarkerType.None" />
+				<RadzenCategoryAxis Padding="20" Formatter="@FormatAsFullDay" Visible="false">
+					<RadzenAxisTitle Text="Date" />
+				</RadzenCategoryAxis>
+				<RadzenValueAxis Formatter="@FormatAsEUR" Visible="true">
+					<RadzenAxisTitle Text="Price in EUR" />
+				</RadzenValueAxis>
+			</RadzenChart>
+		</div>
+	</div>
+</div>
+
+
+@code {
+	DateTime fromDate = DateTime.Today;
+	DateTime toDate = DateTime.Today;
+	int? longestBearish = null;
+	double? highestVolume = null;
+	DateTime? highestVolumeDate = null;
+	DateTime? bestDateToBuy = null;
+	DateTime? bestDateToSell = null;
+	double? bestProfit = 0;
+	Bitcoin bitcoin = new();
+
+	// Graph properties
+	bool smooth = false;
+	List<Price> priceHistory = new();
+
+	private async Task GetDataAsync()
+	{
+		priceHistory.Clear();
+		var bitcoinData = await controller.GetDataAsync(fromDate, toDate);
+		bitcoin = bitcoinData;
+
+		longestBearish = controller.GetLongestBearish(bitcoinData);
+		highestVolumeDate = controller.GetHighestVolume(bitcoinData).date;
+		highestVolume = Math.Round(controller.GetHighestVolume(bitcoinData).volume, 2);
+		var profitData = controller.GetBestProfit(bitcoinData);
+
+		// If bitcoin made profit in given range
+		if (profitData.Profit > 0)
+		{
+			bestDateToBuy = profitData.BuyDate;
+			bestDateToSell = profitData.SellDate;
+			bestProfit = Math.Round(profitData.Profit, 2);
+		}
+
+		else
+		{
+			bestDateToBuy = null;
+			bestDateToSell = null;
+		}
+
+		// Make graph
+		foreach (var btc in bitcoin.PriceHistory)
+		{
+			Price price = new();
+			price.Value = btc.Price;
+			price.Date = controller.UnixTimeToDateTime(btc.Timestamp);
+			priceHistory.Add(price);
+		}
+	}
+	
+	// Contains the data for the graph to show
+	private class Price
+	{
+		public DateTime Date { get; set; }
+		public double Value { get; set; }
+	}
+
+	private string FormatAsEUR(object value)
+	{
+		return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("fi"));
+	}
+
+	private string FormatAsFullDay(object value)
+	{
+		if (value != null)
+		{
+			return Convert.ToDateTime(value).ToString("dddd, dd.MM.yyyy");
+		}
+
+		return string.Empty;
+	}
+}
